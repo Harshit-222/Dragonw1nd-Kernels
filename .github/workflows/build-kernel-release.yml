@@ -56,7 +56,7 @@ on:
         required: true
         type: choice
         options: [none, thin, full]
-        default: none
+        default: thin
       clang_version:
         description: "Select Compiler version"
         required: true
@@ -68,11 +68,15 @@ on:
           - aosp-clang-r563880
           - aosp-clang-r563880c
           - aosp-clang-r574158
-        default: 'aosp-clang-r574158'
+          - aosp-clang-r584948
+          - aosp-clang-r584948b
+          - aosp-clang-r596125
+          - aosp-clang-r614150
+        default: 'default'
       kernel_uname:
         description: 'Kernel uname'
         type: string
-        default: 'Lucy'
+        default: Lucy
       susfs_branch_or_commit:
         description: 'Enter SusFS Branch or commit hash'
         type: string
@@ -107,9 +111,9 @@ on:
           - REDMI_15
           - REDMI_12
         default: POCO_F6
-      fix_extract_cert:
-        description: 'Patch extract-cert.c key_pass (needed for POCO_F6)'
-        required: false
+      mlgo:
+        description: 'enable mlgo [Machine Learning Guided Optimization] (requires compiler support)'
+        required: true
         type: boolean
         default: true
 
@@ -299,21 +303,6 @@ jobs:
         id: _modules
         uses: ./.github/kernel_modules
 
-      - name: Fix extract-cert key_pass
-        if: inputs.fix_extract_cert
-        shell: bash
-        run: |
-          set -euo pipefail
-          ROOT="${{ github.workspace }}/peridot-los23.2/kernel_platform/common"
-          f="$ROOT/certs/extract-cert.c"
-          if [[ -f "$f" ]] && grep -q 'key_pass' "$f"; then
-            sed -i '/static.*key_pass/d' "$f"
-            sed -i '1i __attribute__((unused)) static const char *key_pass;' "$f"
-            echo "Patched $f"
-          else
-            echo "extract-cert.c missing or no key_pass, skipping"
-          fi
-
       - name: Start build
         id: build
         uses: ./.github/build
@@ -335,6 +324,7 @@ jobs:
           lto: ${{ inputs.lto }}
           kernel_uname: ${{ inputs.kernel_uname }}
           compile_dlkm: ${{ inputs.compile_dlkm }}
+          mlgo: ${{ inputs.mlgo }}
 
       - name: Distribution
         id: distribution
@@ -361,4 +351,3 @@ jobs:
         if: always() && steps.tg_check.outputs.enabled == 'true'
         shell: bash
         run: docker rm -f "${{ steps.tg_server.outputs.container_name }}" || true
-

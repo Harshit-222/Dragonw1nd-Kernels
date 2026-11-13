@@ -7,7 +7,8 @@
   "boot_partition_size": "100663296",
   "vendor_boot_partition_size": "100663296",
   "qcacld_dev_name": "qca6750",
-  "clang": "manifest",
+  "clang": "aosp-clang-r614150",
+  "cpu_tune": "cortex-a720",
   "manifest_los_23_2": {
     "url": "https://raw.githubusercontent.com/Harshit-222/kernel_kit/refs/heads/main/kernel_manifest/xiaomeme/poco_f6_los_23.2.xml",
     "os": "LineageOS 23.2",
