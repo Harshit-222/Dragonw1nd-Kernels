@@ -175,7 +175,7 @@ jobs:
   build:
     name: Build ${{ matrix.product }} Dragonw1nd
     needs: set-model
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       product: ${{ matrix.product }}
       codename: ${{ matrix.codename }}
